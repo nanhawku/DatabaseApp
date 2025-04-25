@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
+//First commit comment
+
 public class ManagerDashboard extends JFrame {
 
     private final String dbUrl, dbUser, dbPassword;
