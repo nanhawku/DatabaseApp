@@ -13,7 +13,7 @@ public class DatabaseApp extends JFrame implements ActionListener {
 
     private final String DB_URL = "jdbc:mysql://localhost:3306/ncat";
     private final String DB_USER = "root";
-    private final String DB_PASSWORD = "yourpassword";
+    private final String DB_PASSWORD = "Sanaa81001";
 
     public DatabaseApp() {
         setTitle("Database Login");
