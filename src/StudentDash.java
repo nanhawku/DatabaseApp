@@ -18,7 +18,7 @@ public class StudentDash extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JLabel welcomeLabel = new JLabel("Student Role Menu", JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("Student Dashboard", JLabel.CENTER);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
         add(welcomeLabel, BorderLayout.NORTH);
 
@@ -51,6 +51,8 @@ public class StudentDash extends JFrame {
             }
         });
 
+        loadStudentClasses();
+
         setVisible(true);
     }
 
@@ -60,15 +62,21 @@ public class StudentDash extends JFrame {
             CallableStatement stmt = connection.prepareCall("{call GetStudentClasses(?)}");
             stmt.setInt(1, studentId);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
                 classListModel.addElement(rs.getString("class_name"));
             }
+            //if no classes found
+            if(classListModel.isEmpty()) {
+                classListModel.addElement("No Classes Found");
+            } //end if
+
             rs.close();
             stmt.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error loading classes: " + e.getMessage());
         }
-    }
+    } //end loadStudentClasses
 
     private void dropClass(String className) {
         try {
@@ -76,6 +84,9 @@ public class StudentDash extends JFrame {
             stmt.setInt(1, studentId);
             stmt.setString(2, className);
             stmt.execute();
+
+            JOptionPane.showMessageDialog(this, "Dropped Class: " + className);
+
             stmt.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error dropping class: " + e.getMessage());
