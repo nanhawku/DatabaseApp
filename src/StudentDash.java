@@ -59,7 +59,7 @@ public class StudentDash extends JFrame {
         loadStudentClasses();
 
         setVisible(true);
-    }
+    } //end StudentDash
 
     private String getStudentName(int studentId) {
         try {
@@ -77,7 +77,7 @@ public class StudentDash extends JFrame {
             System.out.println("Error fetching student name: " + e.getMessage());
         }
         return "Student";
-    }
+    } //end getStudentName
 
     private void loadStudentClasses() {
         classListModel.clear();
@@ -104,7 +104,7 @@ public class StudentDash extends JFrame {
             System.out.println("Error loading classes: " + e.getMessage());
             JOptionPane.showMessageDialog(this, "Error loading classes: " + e.getMessage());
         }
-    }
+    } //end loadStudentClasses
 
     private void dropClass(String className) {
         try {
@@ -121,5 +121,5 @@ public class StudentDash extends JFrame {
             System.out.println("Error dropping class: " + e.getMessage());
             JOptionPane.showMessageDialog(this, "Error dropping class: " + e.getMessage());
         }
-    }
-}
+    } //end dropClass
+} //end class StudentDash

@@ -60,7 +60,7 @@ public class DatabaseChecker extends JFrame {
 
         // Automatically test connection on startup
         testConnection();
-    }
+    } //end DatabaseChecker
 
     private void testConnection() {
         outputArea.setText("");
@@ -93,7 +93,7 @@ public class DatabaseChecker extends JFrame {
         } catch (SQLException e) {
             appendOutput("Error connecting to database: " + e.getMessage() + "\n");
         }
-    }
+    } //end testConnection
 
     private void viewUsers() {
         outputArea.setText("");
@@ -127,7 +127,7 @@ public class DatabaseChecker extends JFrame {
         } catch (SQLException e) {
             appendOutput("Error retrieving users: " + e.getMessage() + "\n");
         }
-    }
+    } //end viewUsers
 
     private void viewClasses() {
         outputArea.setText("");
@@ -153,7 +153,7 @@ public class DatabaseChecker extends JFrame {
         } catch (SQLException e) {
             appendOutput("Error retrieving classes: " + e.getMessage() + "\n");
         }
-    }
+    } //end viewClasses
 
     private void viewRoster() {
         outputArea.setText("");
@@ -194,7 +194,7 @@ public class DatabaseChecker extends JFrame {
         } catch (SQLException e) {
             appendOutput("Error retrieving roster: " + e.getMessage() + "\n");
         }
-    }
+    } //end viewRoster
 
     private void addTestData() {
         outputArea.setText("");
@@ -299,15 +299,15 @@ public class DatabaseChecker extends JFrame {
         } catch (SQLException e) {
             appendOutput("Error adding test data: " + e.getMessage() + "\n");
         }
-    }
+    } // end addTestData
 
     private void appendOutput(String text) {
         outputArea.append(text);
         // Scroll to the bottom
         outputArea.setCaretPosition(outputArea.getDocument().getLength());
-    }
+    } //end appendOutput
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(DatabaseChecker::new);
-    }
-}
+    } //end main
+} //end DatabaseChecker

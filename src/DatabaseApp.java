@@ -42,7 +42,7 @@ public class DatabaseApp extends JFrame implements ActionListener {
 
         add(panel);
         setVisible(true);
-    }
+    } // end DatabaseApp
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -89,7 +89,7 @@ public class DatabaseApp extends JFrame implements ActionListener {
                 passwordField.setText("");
             }
         }
-    }
+    } // end actionPerformed
 
     private String authenticateUser(String username, String password) {
         String role = null;
@@ -131,9 +131,9 @@ public class DatabaseApp extends JFrame implements ActionListener {
         }
 
         return role;
-    }
+    } // end authenticateUser
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(DatabaseApp::new);
-    }
+    } //end main
 }

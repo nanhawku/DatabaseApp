@@ -37,7 +37,7 @@ public class ManagerDashboard extends JFrame {
         add(newStudentBtn);
 
         setVisible(true);
-    }
+    } //end constructor
 
     private void viewStudentSchedule() {
         String studentId = JOptionPane.showInputDialog(this, "Enter Student ID:");
@@ -67,7 +67,7 @@ public class ManagerDashboard extends JFrame {
                 showError(ex);
             }
         }
-    }
+    } //end viewStudentSchedule
 
     private void viewClassRoster() {
         String className = JOptionPane.showInputDialog(this, "Enter Class Name:");
@@ -109,7 +109,7 @@ public class ManagerDashboard extends JFrame {
                 showError(ex);
             }
         }
-    }
+    } //end viewClassRoster
 
     private void addStudentToClass() {
         String studentId = JOptionPane.showInputDialog(this, "Enter Student ID:");
@@ -130,7 +130,7 @@ public class ManagerDashboard extends JFrame {
                 showError(ex);
             }
         }
-    }
+    } //end addStudentToClass
 
     private void dropStudentFromClass() {
         String studentId = JOptionPane.showInputDialog(this, "Enter Student ID:");
@@ -151,7 +151,7 @@ public class ManagerDashboard extends JFrame {
                 showError(ex);
             }
         }
-    }
+    } //end dropStudentFromClass
 
     private void addNewStudent() {
         // Create a form for adding a new student
@@ -238,9 +238,9 @@ public class ManagerDashboard extends JFrame {
                 showError(ex);
             }
         }
-    }
+    } //end addNewStudent
 
     private void showError(Exception ex) {
         JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
+    } //end showError
+} //end ManagerDashboard
