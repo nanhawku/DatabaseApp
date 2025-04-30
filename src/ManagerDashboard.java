@@ -7,7 +7,6 @@ public class ManagerDashboard extends JFrame {
 
     private final String dbUrl, dbUser, dbPassword;
 
-    //Constructor
     public ManagerDashboard(String dbUrl, String dbUser, String dbPassword) {
         this.dbUrl = dbUrl;
         this.dbUser = dbUser;
@@ -38,7 +37,7 @@ public class ManagerDashboard extends JFrame {
         add(newStudentBtn);
 
         setVisible(true);
-    } //end constructor
+    }
 
     private void viewStudentSchedule() {
         String studentId = JOptionPane.showInputDialog(this, "Enter Student ID:");
@@ -67,7 +66,7 @@ public class ManagerDashboard extends JFrame {
             } catch (SQLException ex) {
                 showError(ex);
             }
-        }//end viewStudentSchedule
+        }
     }
 
     private void viewClassRoster() {
@@ -86,7 +85,7 @@ public class ManagerDashboard extends JFrame {
                     while (rs.next()) {
                         sb.append("Student ID: ").append(rs.getString("student_id"));
 
-                        // If student_name column exists
+                        // Try to get student name if available
                         try {
                             String name = rs.getString("student_name");
                             if (name != null && !name.trim().isEmpty()) {
@@ -109,8 +108,8 @@ public class ManagerDashboard extends JFrame {
             } catch (SQLException ex) {
                 showError(ex);
             }
-        } //end if
-    } //end viewClassRoster
+        }
+    }
 
     private void addStudentToClass() {
         String studentId = JOptionPane.showInputDialog(this, "Enter Student ID:");
@@ -130,8 +129,8 @@ public class ManagerDashboard extends JFrame {
             } catch (SQLException ex) {
                 showError(ex);
             }
-        }//end if
-    }//end addStudentToClass
+        }
+    }
 
     private void dropStudentFromClass() {
         String studentId = JOptionPane.showInputDialog(this, "Enter Student ID:");
@@ -140,7 +139,7 @@ public class ManagerDashboard extends JFrame {
         if (studentId != null && !studentId.trim().isEmpty() &&
                 className != null && !className.trim().isEmpty()) {
             try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
-                // Use a modified version of our drop student class procedure
+                // Use the drop student procedure
                 String call = "{CALL DropStudentClass(?, ?)}";
                 try (CallableStatement stmt = conn.prepareCall(call)) {
                     stmt.setInt(1, Integer.parseInt(studentId));
@@ -151,8 +150,8 @@ public class ManagerDashboard extends JFrame {
             } catch (SQLException ex) {
                 showError(ex);
             }
-        }//end if
-    }//end dropStudentFromClass
+        }
+    }
 
     private void addNewStudent() {
         // Create a form for adding a new student
@@ -203,6 +202,11 @@ public class ManagerDashboard extends JFrame {
 
             // Extract major ID from selection
             String selectedMajor = (String) majorBox.getSelectedItem();
+            if (selectedMajor == null) {
+                JOptionPane.showMessageDialog(this, "Please select a major!");
+                return;
+            }
+
             int majorId = Integer.parseInt(selectedMajor.split(" - ")[0]);
 
             if (studentId.isEmpty() || firstName.isEmpty() || lastName.isEmpty() ||
@@ -212,25 +216,31 @@ public class ManagerDashboard extends JFrame {
             }
 
             try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
-                // Use the stored procedure
-                String call = "{CALL AddNewStudent(?, ?, ?, ?, ?, ?)}";
-                try (CallableStatement stmt = conn.prepareCall(call)) {
-                    stmt.setString(1, studentId);
-                    stmt.setString(2, firstName);
-                    stmt.setString(3, lastName);
-                    stmt.setString(4, username);
-                    stmt.setString(5, password);
+                // Insert directly into Users table since the stored procedure might be having issues
+                String insertQuery = "INSERT INTO Users (ID, username, userpassword, roleID, fname, lname, majorId) " +
+                        "VALUES (?, ?, ?, 'stu', ?, ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+                    stmt.setInt(1, Integer.parseInt(studentId));
+                    stmt.setString(2, username);
+                    stmt.setString(3, password);
+                    stmt.setString(4, firstName);
+                    stmt.setString(5, lastName);
                     stmt.setInt(6, majorId);
-                    stmt.execute();
-                    JOptionPane.showMessageDialog(this, "Student added successfully.");
+                    int rowsAffected = stmt.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        JOptionPane.showMessageDialog(this, "Student added successfully.");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Failed to add student. Please check your inputs.");
+                    }
                 }
             } catch (SQLException ex) {
                 showError(ex);
             }
         }
-    } //end addNewStudent
+    }
 
     private void showError(Exception ex) {
         JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    } //end showError
-}//end ManagerDashboard
+    }
+}
