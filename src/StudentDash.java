@@ -91,5 +91,5 @@ public class StudentDash extends JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error dropping class: " + e.getMessage());
         }
-    }
-}
+    } // end dropClass
+} //end class StudentDash
