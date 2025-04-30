@@ -78,15 +78,14 @@ public class DatabaseApp extends JFrame implements ActionListener {
         String role = null;
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT role FROM users WHERE username = ? AND password = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            String call = "{CALL authenticate_user(?, ?, ?)}";
+            try (CallableStatement stmt = conn.prepareCall(call)) {
                 stmt.setString(1, username);
                 stmt.setString(2, password);
+                stmt.registerOutParameter(3, Types.VARCHAR);
 
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    role = rs.getString("role");
-                }
+                stmt.execute();
+                role = stmt.getString(3);
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this,
