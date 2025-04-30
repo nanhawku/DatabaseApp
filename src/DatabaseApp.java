@@ -5,18 +5,21 @@ import java.sql.*;
 
 public class DatabaseApp extends JFrame implements ActionListener {
 
+    //GUI Elements
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private int loginAttempts = 0;
     private final int MAX_ATTEMPTS = 3;
 
+    // Use the AggieAdmin and credentials from the SQL file
     private final String DB_URL = "jdbc:mysql://localhost:3306/ncat";
-    private final String DB_USER = "root";
-    private final String DB_PASSWORD = "Sanaa81001";
+    private final String DB_USER = "AggieAdmin";
+    private final String DB_PASSWORD = "AggiePride1";
 
+    //Default constructor
     public DatabaseApp() {
-        setTitle("Database Login");
+        setTitle("NCAT Database Login");
         setSize(300, 170);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -41,7 +44,7 @@ public class DatabaseApp extends JFrame implements ActionListener {
 
         add(panel);
         setVisible(true);
-    }
+    } //end constructor
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -51,10 +54,26 @@ public class DatabaseApp extends JFrame implements ActionListener {
         String role = authenticateUser(username, password);
         if (role != null) {
             JOptionPane.showMessageDialog(this, "Login successful as " + role + "!");
-            if (role.equalsIgnoreCase("manager")) {
-                new ManagerDashboard(DB_URL, DB_USER, DB_PASSWORD);
-            } else {
-                JOptionPane.showMessageDialog(this, "Welcome Student! (Student features coming soon.)");
+            try {
+                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                if (role.equalsIgnoreCase("manager")) {
+                    new ManagerDashboard(DB_URL, DB_USER, DB_PASSWORD);
+                } else if (role.equalsIgnoreCase("student")) {
+                    // Retrieve the student ID from the database
+                    String query = "SELECT ID FROM Users WHERE username = ?";
+                    PreparedStatement stmt = conn.prepareStatement(query);
+                    stmt.setString(1, username);
+                    ResultSet rs = stmt.executeQuery();
+
+                    if (rs.next()) {
+                        int studentId = rs.getInt("ID");
+                        new StudentDash(studentId, conn);
+                    }
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Database connection error: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
             dispose(); // close login window
         } else {
@@ -72,7 +91,7 @@ public class DatabaseApp extends JFrame implements ActionListener {
                 passwordField.setText("");
             }
         }
-    }
+    } //end actionPerformed
 
     private String authenticateUser(String username, String password) {
         String role = null;
@@ -94,10 +113,9 @@ public class DatabaseApp extends JFrame implements ActionListener {
         }
 
         return role;
-    }
+    }//end authenticateUser
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(DatabaseApp::new);
-    }
-}
-
+    }//end main
+} //end DatabaseApp
