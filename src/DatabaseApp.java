@@ -11,12 +11,13 @@ public class DatabaseApp extends JFrame implements ActionListener {
     private int loginAttempts = 0;
     private final int MAX_ATTEMPTS = 3;
 
+    // Use AggieAdmin credentials as defined in the SQL file
     private final String DB_URL = "jdbc:mysql://localhost:3306/ncat";
-    private final String DB_USER = "root";
-    private final String DB_PASSWORD = "Sanaa81001";
+    private final String DB_USER = "AggieAdmin";
+    private final String DB_PASSWORD = "AggiePride1";
 
     public DatabaseApp() {
-        setTitle("Database Login");
+        setTitle("NCAT Database Login");
         setSize(300, 170);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -41,7 +42,7 @@ public class DatabaseApp extends JFrame implements ActionListener {
 
         add(panel);
         setVisible(true);
-    }
+    } // end DatabaseApp
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -51,10 +52,26 @@ public class DatabaseApp extends JFrame implements ActionListener {
         String role = authenticateUser(username, password);
         if (role != null) {
             JOptionPane.showMessageDialog(this, "Login successful as " + role + "!");
-            if (role.equalsIgnoreCase("manager")) {
-                new ManagerDashboard(DB_URL, DB_USER, DB_PASSWORD);
-            } else {
-                JOptionPane.showMessageDialog(this, "Welcome Student! (Student features coming soon.)");
+            try {
+                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                if (role.equalsIgnoreCase("manager")) {
+                    new ManagerDashboard(DB_URL, DB_USER, DB_PASSWORD);
+                } else if (role.equalsIgnoreCase("student")) {
+                    // Retrieve the student ID from the database
+                    String query = "SELECT ID FROM Users WHERE username = ?";
+                    PreparedStatement stmt = conn.prepareStatement(query);
+                    stmt.setString(1, username);
+                    ResultSet rs = stmt.executeQuery();
+
+                    if (rs.next()) {
+                        int studentId = rs.getInt("ID");
+                        new StudentDash(studentId, conn);
+                    }
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Database connection error: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
             dispose(); // close login window
         } else {
@@ -72,12 +89,27 @@ public class DatabaseApp extends JFrame implements ActionListener {
                 passwordField.setText("");
             }
         }
-    }
+    } // end actionPerformed
 
     private String authenticateUser(String username, String password) {
         String role = null;
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+        try {
+            // Load JDBC driver
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                JOptionPane.showMessageDialog(this,
+                        "MySQL JDBC Driver not found! Please install MySQL Connector/J.",
+                        "Driver Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
+            // Test connection
+            Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            System.out.println("Database connection successful!");
+
+            // Try the authentication
             String call = "{CALL authenticate_user(?, ?, ?)}";
             try (CallableStatement stmt = conn.prepareCall(call)) {
                 stmt.setString(1, username);
@@ -86,18 +118,22 @@ public class DatabaseApp extends JFrame implements ActionListener {
 
                 stmt.execute();
                 role = stmt.getString(3);
+                System.out.println("Authentication result: " + (role != null ? "Success as " + role : "Failed"));
             }
+
+            conn.close();
         } catch (SQLException ex) {
+            System.out.println("SQL Error: " + ex.getMessage());
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(this,
                     "Database connection error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         return role;
-    }
+    } // end authenticateUser
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(DatabaseApp::new);
-    }
+    } //end main
 }
-
